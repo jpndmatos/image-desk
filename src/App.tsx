@@ -253,6 +253,189 @@ export default function App() {
           <p className="privacy-note">Files are processed on this device.</p>
         </div>
         <div id="workspace" className="workspace">
+          <section
+            className={'desk ' + (dragging ? 'dragging' : '')}
+            onDragEnter={(e) => {
+              e.preventDefault();
+              dragDepth.current++;
+              setDragging(true);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              if (--dragDepth.current === 0) setDragging(false);
+            }}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              dragDepth.current = 0;
+              setDragging(false);
+              void addFiles(Array.from(e.dataTransfer.files));
+            }}
+            aria-label="Image workspace"
+          >
+            <div className="desk-toolbar">
+              <div>
+                <Images size={16} />
+                <h2>Files</h2>
+                <span className="count">{items.length}</span>
+              </div>
+              <div className="queue-actions">
+                {items.length > 0 && (
+                  <button
+                    className="button"
+                    disabled={disabled || items.length >= 20}
+                    onClick={() => input.current?.click()}
+                  >
+                    <Plus size={16} aria-hidden="true" />
+                    Add files
+                  </button>
+                )}
+                <button
+                  className="text-button"
+                  disabled={disabled || !items.length}
+                  onClick={() => {
+                    for (const item of items) {
+                      revoke(item.url);
+                      if (item.result) revoke(item.result.url);
+                    }
+                    setItems([]);
+                  }}
+                >
+                  <RotateCcw size={13} />
+                  Clear all
+                </button>
+              </div>
+            </div>
+            <input
+              ref={input}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              hidden
+              onChange={(e) => {
+                void addFiles(Array.from(e.target.files || []));
+                e.target.value = '';
+              }}
+            />
+            {items.length === 0 ? (
+              <div className="dropzone">
+                <Upload size={28} className="upload-symbol" aria-hidden="true" />
+                <h2>Add images</h2>
+                <p>Drag files here or choose them from your device.</p>
+                <button
+                  className="button primary"
+                  disabled={disabled}
+                  onClick={() => input.current?.click()}
+                >
+                  <Upload size={15} />
+                  Choose images
+                </button>
+                <span className="file-hint">JPEG, PNG & WebP / Up to 20 images / 30 MB each</span>
+                <div className="sample-line">
+                  <button
+                    disabled={disabled}
+                    onClick={async () => {
+                      try {
+                        await addFiles([await sampleFile()]);
+                      } catch {
+                        setError('Could not create the sample. Try choosing an image.');
+                      }
+                    }}
+                  >
+                    Load sample <ArrowRight size={12} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="image-grid">
+                {items.map((item) => {
+                  let target;
+                  try {
+                    target = fitSize(item.width, item.height, width, height);
+                  } catch {
+                    target = { width: item.width, height: item.height };
+                  }
+                  const saving = item.result
+                    ? Math.round((1 - item.result.blob.size / item.file.size) * 100)
+                    : 0;
+                  return (
+                    <article className="image-card" key={item.id}>
+                      <div className="image-preview">
+                        <img src={item.result?.url || item.url} alt={item.file.name} />
+                        <button
+                          className="preview-button"
+                          onClick={() => setCompare(item.id)}
+                          aria-label={'Preview ' + item.file.name}
+                        >
+                          <Maximize2 size={15} />
+                        </button>
+                        <button
+                          className="remove-button"
+                          disabled={disabled}
+                          onClick={() => remove(item.id)}
+                          aria-label={'Remove ' + item.file.name}
+                        >
+                          <X size={14} />
+                        </button>
+                        {item.result && (
+                          <span className={'savings ' + (saving < 0 ? 'larger' : '')}>
+                            {saving >= 0 ? '−' + saving + '%' : 'Larger file'}
+                          </span>
+                        )}
+                      </div>
+                      <div className="image-details">
+                        <h3 title={item.file.name}>{item.file.name}</h3>
+                        <p>
+                          {item.width} × {item.height}
+                          <ChevronRight size={11} />
+                          {item.result
+                            ? `${item.result.width} × ${item.result.height}`
+                            : `${target.width} × ${target.height}`}
+                        </p>
+                        <div className="image-bottom">
+                          <span>
+                            {bytes(item.file.size)}
+                            {item.result && (
+                              <>
+                                <ArrowRight size={11} />
+                                <strong>{bytes(item.result.blob.size)}</strong>
+                              </>
+                            )}
+                          </span>
+                          {item.result ? (
+                            <button
+                              className="icon-button"
+                              aria-label={'Download ' + item.file.name}
+                              onClick={() =>
+                                download(
+                                  item.result!.blob,
+                                  outputName(item.file.name, item.result!.blob.type),
+                                )
+                              }
+                            >
+                              <Download size={17} />
+                            </button>
+                          ) : (
+                            <span className="status-label">
+                              {busy ? 'Working…' : 'Ready to process'}
+                            </span>
+                          )}
+                        </div>
+                        {item.error && <p className="card-error">{item.error}</p>}
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+            {dragging && (
+              <div className="drag-overlay">
+                <Upload size={35} />
+                <strong>Drop images here</strong>
+                <span>JPEG, PNG, or WebP</span>
+              </div>
+            )}
+          </section>
           <aside className="settings">
             <div className="panel-heading">
               <SlidersHorizontal size={16} />
@@ -388,186 +571,6 @@ export default function App() {
               )}
             </fieldset>
           </aside>
-          <section
-            className={'desk ' + (dragging ? 'dragging' : '')}
-            onDragEnter={(e) => {
-              e.preventDefault();
-              dragDepth.current++;
-              setDragging(true);
-            }}
-            onDragLeave={(e) => {
-              e.preventDefault();
-              if (--dragDepth.current === 0) setDragging(false);
-            }}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              e.preventDefault();
-              dragDepth.current = 0;
-              setDragging(false);
-              void addFiles(Array.from(e.dataTransfer.files));
-            }}
-            aria-label="Image workspace"
-          >
-            <div className="desk-toolbar">
-              <div>
-                <Images size={16} />
-                <h2>Files</h2>
-                <span className="count">{items.length}</span>
-              </div>
-              <button
-                className="text-button"
-                disabled={disabled || !items.length}
-                onClick={() => {
-                  for (const item of items) {
-                    revoke(item.url);
-                    if (item.result) revoke(item.result.url);
-                  }
-                  setItems([]);
-                }}
-              >
-                <RotateCcw size={13} />
-                Clear all
-              </button>
-            </div>
-            <input
-              ref={input}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              multiple
-              hidden
-              onChange={(e) => {
-                void addFiles(Array.from(e.target.files || []));
-                e.target.value = '';
-              }}
-            />
-            {items.length === 0 ? (
-              <div className="dropzone">
-                <Upload size={28} className="upload-symbol" aria-hidden="true" />
-                <h2>Add images</h2>
-                <p>Drag files here or choose them from your device.</p>
-                <button
-                  className="button primary"
-                  disabled={disabled}
-                  onClick={() => input.current?.click()}
-                >
-                  <Upload size={15} />
-                  Choose images
-                </button>
-                <span className="file-hint">JPEG, PNG & WebP / Up to 20 images / 30 MB each</span>
-                <div className="sample-line">
-                  <button
-                    disabled={disabled}
-                    onClick={async () => {
-                      try {
-                        await addFiles([await sampleFile()]);
-                      } catch {
-                        setError('Could not create the sample. Try choosing an image.');
-                      }
-                    }}
-                  >
-                    Load sample <ArrowRight size={12} />
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="image-grid">
-                {items.map((item) => {
-                  let target;
-                  try {
-                    target = fitSize(item.width, item.height, width, height);
-                  } catch {
-                    target = { width: item.width, height: item.height };
-                  }
-                  const saving = item.result
-                    ? Math.round((1 - item.result.blob.size / item.file.size) * 100)
-                    : 0;
-                  return (
-                    <article className="image-card" key={item.id}>
-                      <div className="image-preview">
-                        <img src={item.result?.url || item.url} alt={item.file.name} />
-                        <button
-                          className="preview-button"
-                          onClick={() => setCompare(item.id)}
-                          aria-label={'Preview ' + item.file.name}
-                        >
-                          <Maximize2 size={15} />
-                        </button>
-                        <button
-                          className="remove-button"
-                          disabled={disabled}
-                          onClick={() => remove(item.id)}
-                          aria-label={'Remove ' + item.file.name}
-                        >
-                          <X size={14} />
-                        </button>
-                        {item.result && (
-                          <span className={'savings ' + (saving < 0 ? 'larger' : '')}>
-                            {saving >= 0 ? '−' + saving + '%' : 'Larger file'}
-                          </span>
-                        )}
-                      </div>
-                      <div className="image-details">
-                        <h3 title={item.file.name}>{item.file.name}</h3>
-                        <p>
-                          {item.width} × {item.height}
-                          <ChevronRight size={11} />
-                          {item.result
-                            ? `${item.result.width} × ${item.result.height}`
-                            : `${target.width} × ${target.height}`}
-                        </p>
-                        <div className="image-bottom">
-                          <span>
-                            {bytes(item.file.size)}
-                            {item.result && (
-                              <>
-                                <ArrowRight size={11} />
-                                <strong>{bytes(item.result.blob.size)}</strong>
-                              </>
-                            )}
-                          </span>
-                          {item.result ? (
-                            <button
-                              className="icon-button"
-                              aria-label={'Download ' + item.file.name}
-                              onClick={() =>
-                                download(
-                                  item.result!.blob,
-                                  outputName(item.file.name, item.result!.blob.type),
-                                )
-                              }
-                            >
-                              <Download size={17} />
-                            </button>
-                          ) : (
-                            <span className="status-label">
-                              {busy ? 'Working…' : 'Ready to process'}
-                            </span>
-                          )}
-                        </div>
-                        {item.error && <p className="card-error">{item.error}</p>}
-                      </div>
-                    </article>
-                  );
-                })}
-                <button
-                  className="add-card"
-                  disabled={disabled}
-                  onClick={() => input.current?.click()}
-                >
-                  <Plus size={23} />
-                  <span>Add images</span>
-                  <small>Choose files</small>
-                </button>
-              </div>
-            )}
-            {dragging && (
-              <div className="drag-overlay">
-                <Upload size={35} />
-                <strong>Drop images here</strong>
-                <span>JPEG, PNG, or WebP</span>
-              </div>
-            )}
-          </section>
         </div>
         {error && (
           <div className="error" role="alert">
@@ -577,48 +580,68 @@ export default function App() {
             </button>
           </div>
         )}
-        <div className="action-bar">
-          <div className="batch-summary">
-            <div>
-              <strong>
-                {ready.length
-                  ? `${ready.length} image${ready.length === 1 ? '' : 's'} processed`
-                  : items.length
-                    ? `${items.length} image${items.length === 1 ? '' : 's'} selected`
-                    : 'No images selected'}
-              </strong>
-              <p>
-                {ready.length
-                  ? `${bytes(originalBytes)} → ${bytes(outputBytes)} / ${saved >= 0 ? bytes(saved) + ' saved' : bytes(-saved) + ' larger, try a smaller size or lower quality'}`
-                  : items.length
-                    ? 'Choose export settings, then process the files.'
-                    : 'Add files to start a batch.'}
-              </p>
+        {items.length > 0 && (
+          <div className="action-bar">
+            {busy && (
+              <progress
+                className="batch-progress"
+                aria-label="Batch processing"
+                value={progress}
+                max={items.length}
+              />
+            )}
+            <div className="batch-summary">
+              <div>
+                <strong>
+                  {ready.length
+                    ? `${ready.length} image${ready.length === 1 ? '' : 's'} processed`
+                    : items.length
+                      ? `${items.length} image${items.length === 1 ? '' : 's'} selected`
+                      : 'No images selected'}
+                </strong>
+                <p>
+                  {ready.length
+                    ? `${bytes(originalBytes)} → ${bytes(outputBytes)} / ${saved >= 0 ? bytes(saved) + ' saved' : bytes(-saved) + ' larger, try a smaller size or lower quality'}`
+                    : items.length
+                      ? 'Choose export settings, then process the files.'
+                      : 'Add files to start a batch.'}
+                </p>
+              </div>
+            </div>
+            <div className="action-buttons">
+              {ready.length > 0 && (
+                <button
+                  className={ready.length === items.length ? 'button primary' : 'button'}
+                  disabled={disabled}
+                  onClick={() => void downloadAll()}
+                >
+                  <Download size={16} />
+                  Download ZIP
+                </button>
+              )}
+              {ready.length < items.length && (
+                <button
+                  className="button primary"
+                  disabled={disabled || !items.length}
+                  onClick={() => void convert()}
+                >
+                  {busy ? (
+                    <LoaderCircle size={16} className="spin" />
+                  ) : (
+                    <SlidersHorizontal size={16} />
+                  )}{' '}
+                  {busy
+                    ? `Processing ${progress}/${items.length}`
+                    : adding
+                      ? 'Adding images…'
+                      : ready.length === items.length && items.length
+                        ? 'Process again'
+                        : 'Process images'}
+                </button>
+              )}
             </div>
           </div>
-          <div className="action-buttons">
-            {ready.length > 0 && (
-              <button className="button" disabled={disabled} onClick={() => void downloadAll()}>
-                <Download size={16} />
-                Download ZIP
-              </button>
-            )}
-            <button
-              className="button primary"
-              disabled={disabled || !items.length}
-              onClick={() => void convert()}
-            >
-              {busy ? <LoaderCircle size={16} className="spin" /> : <SlidersHorizontal size={16} />}{' '}
-              {busy
-                ? `Processing ${progress}/${items.length}`
-                : adding
-                  ? 'Adding images…'
-                  : ready.length === items.length && items.length
-                    ? 'Process again'
-                    : 'Process images'}
-            </button>
-          </div>
-        </div>
+        )}
       </main>
       {notice && (
         <div className="toast" role="status">

@@ -702,3 +702,184 @@ main {
     flex-wrap: wrap;
   }
 }
+
+/* Files and export settings share a flat, non-elevated workspace. */
+.topbar {
+  border-bottom: 0;
+}
+.workspace {
+  border: 0;
+  border-radius: 8px;
+  overflow: clip;
+  min-height: 560px;
+}
+.settings {
+  border-left: 0;
+  padding: 24px;
+}
+.panel-heading {
+  margin-bottom: 24px;
+}
+.settings fieldset {
+  margin-bottom: 24px;
+}
+.desk-toolbar {
+  border-bottom: 0;
+  padding: 16px 24px;
+  gap: 16px;
+}
+.queue-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.queue-actions .button {
+  font-size: 12px;
+  min-height: 36px;
+  padding: 8px 12px;
+}
+.dropzone {
+  margin: 0 24px 24px;
+  min-height: 360px;
+  border-color: var(--color-input-edge);
+  border-radius: 4px;
+}
+.presets {
+  display: flex;
+  gap: 4px;
+  background: var(--color-paper-2);
+  padding: 4px;
+  border-radius: 4px;
+}
+.presets button {
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  min-height: 36px;
+}
+.presets button + button {
+  border: 0;
+}
+.presets button.active {
+  background: var(--color-selected);
+  color: var(--color-accent);
+}
+.format-options label {
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.format-options label.checked {
+  background: var(--color-selected);
+  color: var(--color-accent);
+}
+.format-options small {
+  font-size: 11px;
+}
+.image-grid {
+  padding: 8px 24px 24px;
+  gap: 20px;
+}
+.image-card {
+  border: 0;
+  border-radius: 4px;
+  overflow: clip;
+  background: var(--color-paper-3);
+  color: var(--color-ink);
+}
+.image-preview {
+  height: 200px;
+}
+.image-details {
+  padding: 16px;
+}
+.preview-button,
+.remove-button {
+  border: 0;
+  background: var(--color-paper-2);
+}
+.savings {
+  border: 0;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.action-bar {
+  border: 0;
+  border-top: 1px solid var(--color-rule);
+  border-radius: 0 0 8px 8px;
+  margin-top: 0;
+  padding: 20px 24px;
+  min-height: 88px;
+}
+.batch-progress {
+  position: absolute;
+  inset: 0 0 auto;
+  width: 100%;
+  height: 4px;
+  border: 0;
+  accent-color: var(--color-accent);
+  background: var(--color-paper-3);
+}
+.batch-progress::-webkit-progress-bar {
+  background: var(--color-paper-3);
+}
+.batch-progress::-webkit-progress-value {
+  background: var(--color-accent);
+}
+.batch-progress::-moz-progress-bar {
+  background: var(--color-accent);
+}
+.compare-controls button {
+  border: 0;
+  background: var(--color-paper-3);
+}
+.compare-controls button.active {
+  border: 0;
+}
+@media (max-width: 850px) {
+  .settings {
+    border: 0;
+    gap: 24px;
+  }
+  .settings fieldset {
+    margin: 0;
+  }
+  .action-bar {
+    padding: 16px 20px;
+  }
+  .image-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 520px) {
+  .desk-toolbar {
+    padding: 16px;
+    flex-wrap: wrap;
+  }
+  .queue-actions {
+    margin-left: auto;
+  }
+  .dropzone {
+    margin: 0 16px 16px;
+    min-height: 320px;
+  }
+  .settings {
+    padding: 24px 16px;
+  }
+  .image-grid {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 8px 16px 24px;
+  }
+  .image-preview {
+    height: 220px;
+  }
+  .action-bar {
+    padding: 16px;
+  }
+  .action-buttons .button {
+    min-height: 44px;
+  }
+  .format-options label,
+  .presets button {
+    min-height: 44px;
+  }
+}

@@ -7,3 +7,5 @@ Layout: image queue with a right-hand export inspector and a sticky batch action
 Colours and fonts live in src/tokens.css. Both themes have explicit foreground/background pairs, native colour schemes, and focus rings. The theme control stores an app-specific preference; system preference is used on the first visit.
 
 Preserve existing fields, API routes, calculations, downloads, and keyboard controls. Avoid decorative badges, status dots, oversized introductions, slogans, and background illustrations. State indicators must communicate real application state.
+
+Material flat refinement: tonal surfaces rather than outlined containers, filled fields with a clear lower edge, neutral secondary actions, no shadows, and one primary action per task state. Keep real data and work controls prominent.

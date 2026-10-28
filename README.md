@@ -10,6 +10,8 @@ Batch image resizing and format conversion, processed locally in the browser.
 
 ## What it does
 
+- The primary batch action changes to Download ZIP when processing is complete.
+
 - Add JPEG, PNG, and WebP images through a file picker or drag and drop.
 - Process up to 20 images per batch, limited to 30 MB / 40 megapixels each.
 - Export WebP, JPEG, or PNG; choose quality for lossy formats.
