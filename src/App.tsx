@@ -245,7 +245,7 @@ export default function App() {
         Skip to workspace
       </a>
       <header className="topbar">
-        <a className="brand" href="/">
+        <a className="brand" href="./">
           <span className="brand-mark">
             <Layers size={21} />
           </span>
