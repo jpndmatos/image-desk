@@ -1,21 +1,16 @@
+import ThemeToggle from './ThemeToggle';
 import { useEffect, useRef, useState } from 'react';
 import {
-  ArrowDown,
   ArrowRight,
   Check,
   ChevronRight,
   Download,
-  ImagePlus,
   Images,
-  Layers,
   LoaderCircle,
-  LockKeyhole,
   Maximize2,
   Plus,
   RotateCcw,
   SlidersHorizontal,
-  Sparkles,
-  Trash2,
   Upload,
   X,
 } from 'lucide-react';
@@ -39,7 +34,7 @@ type Item = {
   error?: string;
 };
 const presets = [
-  { name: 'Web', width: 1600, height: 1600, note: 'For everyday pages' },
+  { name: 'Web', width: 1600, height: 1600, note: 'Maximum 1600 px' },
   { name: 'Social', width: 1080, height: 1080, note: 'Fits inside 1080 × 1080' },
   { name: 'Original', width: 20000, height: 20000, note: 'Keep original dimensions' },
 ];
@@ -152,9 +147,7 @@ export default function App() {
     setAdding(false);
     if (problems.length) setError(problems.join(' '));
     if (accepted.length)
-      setNotice(
-        `${accepted.length} image${accepted.length === 1 ? '' : 's'} added. Ready when you are.`,
-      );
+      setNotice(`${accepted.length} image${accepted.length === 1 ? '' : 's'} added. `);
   }
   async function convert() {
     if (busy || adding || !items.length) return;
@@ -200,7 +193,7 @@ export default function App() {
       await new Promise((r) => setTimeout(r, 0));
     }
     setBusy(false);
-    setNotice(`${succeeded} of ${items.length} images ready to download.`);
+    setNotice(`${succeeded} of ${items.length} images processed.`);
   }
   function remove(id: string) {
     setItems((old) =>
@@ -228,7 +221,7 @@ export default function App() {
         }),
         'image-desk.zip',
       );
-      setNotice('Your image pack is ready.');
+      setNotice('ZIP downloaded.');
     } catch {
       setError('Could not create the ZIP. You can still download images individually.');
     }
@@ -246,46 +239,27 @@ export default function App() {
       </a>
       <header className="topbar">
         <a className="brand" href="./">
-          <span className="brand-mark">
-            <Layers size={21} />
-          </span>
-          image desk<span className="brand-dot">.</span>
+          Image Desk
         </a>
-        <span className="header-note">A LITTLE LESS WEIGHT. A LOT MORE ROOM.</span>
-        <span className="local-badge">
-          <span />
-          Runs on your device
-        </span>
+        <span className="header-purpose">Image converter</span>
+        <ThemeToggle />
       </header>
       <main>
         <div className="intro">
           <div>
-            <span className="eyebrow">THE SMALL, USEFUL THINGS</span>
-            <h1>
-              Good images.
-              <br className="mobile-br" /> Lighter footprint.
-            </h1>
-            <p>Resize, tidy up, and send them out into the web.</p>
+            <h1>Convert images</h1>
+            <p>Resize and export JPEG, PNG, and WebP files.</p>
           </div>
-          <div className="privacy-note">
-            <LockKeyhole size={17} />
-            <p>
-              Your files stay yours.
-              <br />
-              <strong>Nothing gets uploaded.</strong>
-            </p>
-          </div>
+          <p className="privacy-note">Files are processed on this device.</p>
         </div>
         <div id="workspace" className="workspace">
           <aside className="settings">
             <div className="panel-heading">
               <SlidersHorizontal size={16} />
-              <h2>The finishing touches</h2>
+              <h2>Export settings</h2>
             </div>
             <fieldset disabled={disabled}>
-              <legend className="step-label">
-                <span>01</span>Choose a starting point
-              </legend>
+              <legend className="step-label">Preset</legend>
               <div className="presets">
                 {presets.map((p) => (
                   <button
@@ -305,13 +279,11 @@ export default function App() {
                 ))}
               </div>
               <p className="hint">
-                {presets.find((p) => p.name === preset)?.note || 'Your own size limits'}
+                {presets.find((p) => p.name === preset)?.note || 'Custom dimensions'}
               </p>
             </fieldset>
             <fieldset disabled={disabled}>
-              <legend className="step-label">
-                <span>02</span>Pick your format
-              </legend>
+              <legend className="step-label">Format</legend>
               <div className="format-options">
                 {(['image/webp', 'image/jpeg', 'image/png'] as Format[]).map((f) => (
                   <label key={f} className={format === f ? 'checked' : ''}>
@@ -325,7 +297,7 @@ export default function App() {
                       }}
                     />
                     <span>{formatNames[f]}</span>
-                    {f === 'image/webp' && <small>WEB FRIENDLY</small>}
+                    {f === 'image/webp' && <small>Recommended</small>}
                   </label>
                 ))}
               </div>
@@ -333,14 +305,13 @@ export default function App() {
                 {format === 'image/png'
                   ? 'Lossless output. Best for transparency and graphics.'
                   : format === 'image/jpeg'
-                    ? 'A familiar format for photographs.'
-                    : 'A good balance of size and quality.'}
+                    ? 'Lossy format for photographs.'
+                    : 'Lossy format with transparency support.'}
               </p>
             </fieldset>
             <fieldset disabled={disabled || format === 'image/png'}>
               <legend className="step-label">
-                <span>03</span>Find the sweet spot{' '}
-                <strong>{format === 'image/png' ? 'Lossless' : quality + '%'}</strong>
+                Quality <strong>{format === 'image/png' ? 'Lossless' : quality + '%'}</strong>
               </legend>
               <input
                 aria-label="Image quality"
@@ -360,9 +331,7 @@ export default function App() {
               {format === 'image/png' && <p className="hint">PNG doesn’t use a quality setting.</p>}
             </fieldset>
             <fieldset disabled={disabled}>
-              <legend className="step-label">
-                <span>04</span>Set the boundaries
-              </legend>
+              <legend className="step-label">Maximum dimensions</legend>
               <div className="dimension-fields">
                 <label>
                   Max width
@@ -402,7 +371,7 @@ export default function App() {
               </div>
               <span className="aspect-note">
                 <Check size={12} />
-                Keep proportions. Never upscale.
+                Preserve aspect ratio. No upscaling.
               </span>
               {format === 'image/jpeg' && (
                 <label className="background-field">
@@ -418,10 +387,6 @@ export default function App() {
                 </label>
               )}
             </fieldset>
-            <div className="settings-footer">
-              <Sparkles size={15} />
-              <span>A smaller file is a faster page.</span>
-            </div>
           </aside>
           <section
             className={'desk ' + (dragging ? 'dragging' : '')}
@@ -446,8 +411,8 @@ export default function App() {
             <div className="desk-toolbar">
               <div>
                 <Images size={16} />
-                <h2>Your images</h2>
-                <span className="count">{items.length.toString().padStart(2, '0')}</span>
+                <h2>Files</h2>
+                <span className="count">{items.length}</span>
               </div>
               <button
                 className="text-button"
@@ -461,7 +426,7 @@ export default function App() {
                 }}
               >
                 <RotateCcw size={13} />
-                Clear desk
+                Clear all
               </button>
             </div>
             <input
@@ -477,20 +442,9 @@ export default function App() {
             />
             {items.length === 0 ? (
               <div className="dropzone">
-                <div className="paper-stack">
-                  <div className="paper back" />
-                  <div className="paper middle" />
-                  <div className="paper front">
-                    <div className="mini-sun" />
-                    <div className="mini-hills" />
-                    <ImagePlus size={25} />
-                  </div>
-                  <span className="paper-plus">
-                    <Plus size={17} />
-                  </span>
-                </div>
-                <h2>A fresh desk. Bring your images.</h2>
-                <p>Drop them here, or choose a few to get started.</p>
+                <Upload size={28} className="upload-symbol" aria-hidden="true" />
+                <h2>Add images</h2>
+                <p>Drag files here or choose them from your device.</p>
                 <button
                   className="button primary"
                   disabled={disabled}
@@ -499,9 +453,8 @@ export default function App() {
                   <Upload size={15} />
                   Choose images
                 </button>
-                <span className="file-hint">JPEG, PNG & WebP · Up to 20 images · 30 MB each</span>
+                <span className="file-hint">JPEG, PNG & WebP / Up to 20 images / 30 MB each</span>
                 <div className="sample-line">
-                  <span>Just looking around?</span>
                   <button
                     disabled={disabled}
                     onClick={async () => {
@@ -512,7 +465,7 @@ export default function App() {
                       }
                     }}
                   >
-                    Try a sample <ArrowRight size={12} />
+                    Load sample <ArrowRight size={12} />
                   </button>
                 </div>
               </div>
@@ -602,25 +555,18 @@ export default function App() {
                   onClick={() => input.current?.click()}
                 >
                   <Plus size={23} />
-                  <span>A few more?</span>
-                  <small>Choose or drop images</small>
+                  <span>Add images</span>
+                  <small>Choose files</small>
                 </button>
               </div>
             )}
             {dragging && (
               <div className="drag-overlay">
                 <Upload size={35} />
-                <strong>Right here is good.</strong>
-                <span>Drop your images to add them.</span>
+                <strong>Drop images here</strong>
+                <span>JPEG, PNG, or WebP</span>
               </div>
             )}
-            <div className="desk-footer">
-              <span>
-                <LockKeyhole size={12} />
-                Private by design. Processed in your browser.
-              </span>
-              <span>NO ACCOUNT. NO FUSS.</span>
-            </div>
           </section>
         </div>
         {error && (
@@ -633,23 +579,20 @@ export default function App() {
         )}
         <div className="action-bar">
           <div className="batch-summary">
-            <span className="summary-icon">
-              <ArrowDown size={18} />
-            </span>
             <div>
               <strong>
                 {ready.length
-                  ? `${ready.length} image${ready.length === 1 ? '' : 's'}, ready for the web.`
+                  ? `${ready.length} image${ready.length === 1 ? '' : 's'} processed`
                   : items.length
-                    ? `${items.length} image${items.length === 1 ? '' : 's'} on your desk.`
-                    : 'Small changes. Faster pages.'}
+                    ? `${items.length} image${items.length === 1 ? '' : 's'} selected`
+                    : 'No images selected'}
               </strong>
               <p>
                 {ready.length
-                  ? `${bytes(originalBytes)} → ${bytes(outputBytes)} · ${saved >= 0 ? bytes(saved) + ' saved' : bytes(-saved) + ' larger — try a smaller size or lower quality'}`
+                  ? `${bytes(originalBytes)} → ${bytes(outputBytes)} / ${saved >= 0 ? bytes(saved) + ' saved' : bytes(-saved) + ' larger, try a smaller size or lower quality'}`
                   : items.length
-                    ? 'Choose your settings, then make them web-ready.'
-                    : 'Your next page load will thank you.'}
+                    ? 'Choose export settings, then process the files.'
+                    : 'Add files to start a batch.'}
               </p>
             </div>
           </div>
@@ -665,21 +608,17 @@ export default function App() {
               disabled={disabled || !items.length}
               onClick={() => void convert()}
             >
-              {busy ? <LoaderCircle size={16} className="spin" /> : <Sparkles size={16} />}{' '}
+              {busy ? <LoaderCircle size={16} className="spin" /> : <SlidersHorizontal size={16} />}{' '}
               {busy
                 ? `Processing ${progress}/${items.length}`
                 : adding
                   ? 'Adding images…'
                   : ready.length === items.length && items.length
                     ? 'Process again'
-                    : 'Make web-ready'}
+                    : 'Process images'}
             </button>
           </div>
         </div>
-        <footer className="page-footer">
-          <span>A tiny tool for a lighter web.</span>
-          <span>IMAGE DESK / AN INDEPENDENT LITTLE UTILITY</span>
-        </footer>
       </main>
       {notice && (
         <div className="toast" role="status">
@@ -718,13 +657,13 @@ export default function App() {
                 className={showOriginal ? 'active' : ''}
                 onClick={() => setShowOriginal(true)}
               >
-                Original · {bytes(active.file.size)}
+                Original / {bytes(active.file.size)}
               </button>
               <button
                 className={!showOriginal ? 'active' : ''}
                 onClick={() => setShowOriginal(false)}
               >
-                {active.result ? `Processed · ${bytes(active.result.blob.size)}` : 'Preview'}
+                {active.result ? `Processed / ${bytes(active.result.blob.size)}` : 'Preview'}
               </button>
             </div>
             <div className="large-preview">
@@ -737,7 +676,7 @@ export default function App() {
               {showOriginal
                 ? 'Original image'
                 : active.result
-                  ? `${active.result.width} × ${active.result.height} · ${active.result.blob.type}`
+                  ? `${active.result.width} × ${active.result.height} / ${active.result.blob.type}`
                   : 'Process this image to compare the result.'}
             </p>
           </>

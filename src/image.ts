@@ -88,9 +88,9 @@ export async function sampleFile() {
   }
   ctx.fillStyle = '#fff8e9';
   ctx.font = '500 35px sans-serif';
-  ctx.fillText('A LITTLE ROOM TO BREATHE', 120, 1380);
+  ctx.fillText('SAMPLE IMAGE', 120, 1380);
   ctx.font = '90px Georgia';
-  ctx.fillText('Somewhere, slowly.', 115, 1500);
+  ctx.fillText('Landscape sample', 115, 1500);
   const blob = await new Promise<Blob>((resolve) => canvas.toBlob((b) => resolve(b!), 'image/png'));
-  return new File([blob], 'somewhere-slowly.png', { type: 'image/png' });
+  return new File([blob], 'sample-landscape.png', { type: 'image/png' });
 }

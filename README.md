@@ -1,10 +1,12 @@
 # Image Desk
 
-A small workspace for web-ready images. Resize and export your images without uploading them to a server.
+Batch image resizing and format conversion, processed locally in the browser.
 
 [Try the live demo](https://jpndmatos.github.io/image-desk/)
 
 ![Image Desk workspace](docs/desktop.jpg)
+
+![Dark theme](docs/dark.jpg)
 
 ## What it does
 
@@ -47,6 +49,6 @@ React, TypeScript, and Vite. Native Canvas handles resizing and encoding; fflate
 - Canvas exports do not preserve original EXIF metadata. This is a web preparation tool, not a print or archival editor.
 - Files and settings are not saved between visits. Processing runs on the main thread, with a yield between images; very large images may briefly affect responsiveness.
 
-Image contents never leave the browser. The page fetches its code, fonts, and styles; Google Fonts serves DM Sans and Manrope. There is no analytics or account system.
+Image contents never leave the browser. Code, Poppins fonts, and styles are served from the app itself. There is no analytics or account system. Light and dark themes remember the selected appearance.
 
 Built by [João Matos](https://github.com/jpndmatos). MIT licensed. Icons by Lucide.
