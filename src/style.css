@@ -894,3 +894,56 @@ main {
   height: 28px;
   flex-shrink: 0;
 }
+
+/* File actions remain readable against image content. */
+.image-preview {
+  isolation: isolate;
+}
+.preview-button,
+.remove-button {
+  min-width: 36px;
+  min-height: 36px;
+}
+.image-card:focus-within {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+.image-details h3 {
+  line-height: 1.7;
+}
+.settings .hint {
+  min-height: 2lh;
+}
+.action-buttons .button {
+  min-width: 144px;
+}
+@media (min-width: 851px) {
+  .settings {
+    align-self: start;
+    position: sticky;
+    top: 16px;
+  }
+  .workspace {
+    overflow: visible;
+  }
+  .desk {
+    min-height: 560px;
+  }
+}
+@media (max-width: 520px) {
+  .queue-actions {
+    gap: 4px;
+  }
+  .queue-actions .button,
+  .queue-actions .text-button {
+    min-height: 44px;
+  }
+  .preview-button,
+  .remove-button {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  .action-buttons .button {
+    min-width: 0;
+  }
+}
