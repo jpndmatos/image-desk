@@ -1,0 +1,203 @@
+/* Batch workbench with a fixed action area and compact settings. */
+.settings-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--color-rule);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+}
+.settings-tabs button {
+  flex: 1;
+  padding: 8px;
+  min-height: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink-2);
+  border-radius: 4px;
+}
+.settings-tabs button[aria-pressed='true'] {
+  background: var(--color-selected);
+  color: var(--color-accent);
+}
+.export-settings[hidden],
+.transform-settings[hidden] {
+  display: none;
+}
+.transform-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+.transform-check input {
+  width: 18px;
+  height: 18px;
+}
+.prefix-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+.transform-settings select {
+  width: 100%;
+}
+@media (min-width: 1000px) and (min-height: 600px) {
+  #root {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .topbar {
+    min-height: 56px;
+    padding: 8px 24px;
+    flex-shrink: 0;
+    width: 100%;
+  }
+  main {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+  }
+  .intro {
+    margin-bottom: 12px;
+    flex-shrink: 0;
+    gap: 12px;
+  }
+  .intro h1 {
+    font-size: 24px;
+  }
+  .intro p {
+    font-size: 12px;
+    margin-top: 4px;
+  }
+  .workspace {
+    flex: 1;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    overflow: clip;
+  }
+  .settings {
+    position: static;
+    align-self: stretch;
+    min-height: 0;
+    overflow: auto;
+    padding: 16px;
+  }
+  .panel-heading {
+    margin-bottom: 12px;
+  }
+  .export-settings {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .settings fieldset {
+    min-width: 0;
+    margin-bottom: 0;
+  }
+  .export-settings fieldset:last-child {
+    grid-column: 1/-1;
+  }
+  .step-label {
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+  .settings .hint {
+    min-height: 0;
+    font-size: 11px;
+    line-height: 1.5;
+    margin-top: 4px;
+  }
+  .format-options {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .format-options label {
+    padding: 8px;
+    font-size: 12px;
+    min-height: 36px;
+    flex: 1;
+  }
+  .format-options small {
+    display: none;
+  }
+  .presets button {
+    font-size: 11px;
+    padding: 4px;
+  }
+  .range-labels {
+    font-size: 10px;
+  }
+  .aspect-note {
+    margin-top: 8px;
+  }
+  .desk {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .desk-toolbar {
+    flex-shrink: 0;
+    padding: 12px 16px;
+  }
+  .dropzone {
+    flex: 1;
+    min-height: 0;
+    margin: 16px;
+    padding: 20px;
+  }
+  .dropzone > p {
+    margin: 8px 0 16px;
+  }
+  .sample-line {
+    margin-top: 16px;
+  }
+  .image-grid {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    align-content: start;
+    padding: 16px;
+    gap: 16px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .image-preview {
+    height: 150px;
+  }
+  .image-details {
+    padding: 12px;
+  }
+  .image-details p {
+    font-size: 11px;
+  }
+  .action-bar {
+    position: static;
+    flex-shrink: 0;
+    margin-top: 12px;
+    padding: 12px 16px;
+    min-height: 68px;
+  }
+  .batch-summary p {
+    font-size: 11px;
+  }
+  .action-buttons .button {
+    min-width: 120px;
+  }
+  .error {
+    flex-shrink: 0;
+    margin: 8px 0 0;
+  }
+}
+@media (min-width: 1000px) and (max-width: 1200px) {
+  .image-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .workspace {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+}

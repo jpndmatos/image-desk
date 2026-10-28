@@ -5,25 +5,27 @@ A browser tool for resizing and converting images in batches. Set the size, form
 [Open Image Desk](https://jpndmatos.github.io/image-desk/)
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/dark.jpg">
-  <img src="docs/desktop.jpg" alt="Image Desk desktop interface" width="1200">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/dark-dashboard.jpg">
+  <img src="docs/desktop-dashboard.jpg" alt="Image Desk desktop interface" width="1200">
 </picture>
 
 <details>
   <summary>Mobile view</summary>
   <br>
-  <img src="docs/mobile.jpg" alt="Image Desk mobile interface" width="320">
+  <img src="docs/mobile-dashboard.jpg" alt="Image Desk mobile interface" width="320">
 </details>
 
 ## Features
 
 - Drag-and-drop uploads for JPEG, PNG, and WebP.
-- Batch resizing with aspect ratios preserved.
+- Batch resizing, quarter-turn rotation, and horizontal flipping.
 - Format, quality, and transparency background settings.
 - Original and processed previews with file-size comparisons.
-- Individual downloads or a ZIP, with light and dark themes.
+- Filename prefixes, individual downloads or a ZIP, and light and dark themes.
 
 Images are processed on your device using Canvas. Files stay in the browser.
+
+The desktop workbench keeps the file queue, export settings, and processing actions on one screen.
 
 ## Stack
 

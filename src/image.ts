@@ -27,6 +27,17 @@ export async function readImage(url: string): Promise<HTMLImageElement> {
   await img.decode();
   return img;
 }
+export function orientedSize(width: number, height: number, rotation: number) {
+  if (![0, 90, 180, 270].includes(rotation)) throw new Error('Choose a quarter-turn rotation.');
+  return rotation === 90 || rotation === 270 ? { width: height, height: width } : { width, height };
+}
+export function exportFilename(name: string, type: string, prefix: string) {
+  const clean = prefix
+    .trim()
+    .replace(/[^a-zA-Z0-9_-]/g, '_')
+    .slice(0, 40);
+  return (clean ? clean + '-' : '') + outputName(name, type);
+}
 export async function processImage(
   url: string,
   format: Format,
@@ -34,9 +45,12 @@ export async function processImage(
   maxWidth: number,
   maxHeight: number,
   background: string,
+  rotation = 0,
+  flip = false,
 ) {
   const img = await readImage(url);
-  const size = fitSize(img.naturalWidth, img.naturalHeight, maxWidth, maxHeight);
+  const oriented = orientedSize(img.naturalWidth, img.naturalHeight, rotation);
+  const size = fitSize(oriented.width, oriented.height, maxWidth, maxHeight);
   const canvas = document.createElement('canvas');
   canvas.width = size.width;
   canvas.height = size.height;
@@ -47,7 +61,13 @@ export async function processImage(
     ctx.fillRect(0, 0, size.width, size.height);
   }
   ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(img, 0, 0, size.width, size.height);
+  ctx.translate(size.width / 2, size.height / 2);
+  ctx.scale(flip ? -1 : 1, 1);
+  ctx.rotate((rotation * Math.PI) / 180);
+  const quarterTurn = rotation === 90 || rotation === 270;
+  const drawWidth = quarterTurn ? size.height : size.width;
+  const drawHeight = quarterTurn ? size.width : size.height;
+  ctx.drawImage(img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
   const blob = await new Promise<Blob>((resolve, reject) =>
     canvas.toBlob(
       (b) => (b ? resolve(b) : reject(new Error('This image could not be exported.'))),

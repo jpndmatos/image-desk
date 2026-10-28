@@ -18,7 +18,8 @@ import { zipSync } from 'fflate';
 import {
   bytes,
   fitSize,
-  outputName,
+  exportFilename,
+  orientedSize,
   processImage,
   readImage,
   sampleFile,
@@ -52,6 +53,11 @@ function download(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(url), 30000);
 }
 export default function App() {
+  const [rotation, setRotation] = useState(0),
+    [flip, setFlip] = useState(false),
+    [prefix, setPrefix] = useState(''),
+    [settingsTab, setSettingsTab] = useState<'export' | 'transform'>('export');
+  const namedOutput = (name: string, type: string) => exportFilename(name, type, prefix);
   const [items, setItems] = useState<Item[]>([]),
     [format, setFormat] = useState<Format>('image/webp'),
     [quality, setQuality] = useState(82),
@@ -175,6 +181,8 @@ export default function App() {
           width,
           height,
           background,
+          rotation,
+          flip,
         );
         const url = makeUrl(result.blob);
         if (item.result) revoke(item.result.url);
@@ -212,7 +220,7 @@ export default function App() {
       for (let i = 0; i < ready.length; i++) {
         const item = ready[i];
         entries[
-          `${String(i + 1).padStart(2, '0')}-${outputName(item.file.name, item.result!.blob.type)}`
+          `${String(i + 1).padStart(2, '0')}-${namedOutput(item.file.name, item.result!.blob.type)}`
         ] = new Uint8Array(await item.result!.blob.arrayBuffer());
       }
       download(
@@ -359,7 +367,8 @@ export default function App() {
                 {items.map((item) => {
                   let target;
                   try {
-                    target = fitSize(item.width, item.height, width, height);
+                    const oriented = orientedSize(item.width, item.height, rotation);
+                    target = fitSize(oriented.width, oriented.height, width, height);
                   } catch {
                     target = { width: item.width, height: item.height };
                   }
@@ -417,7 +426,7 @@ export default function App() {
                               onClick={() =>
                                 download(
                                   item.result!.blob,
-                                  outputName(item.file.name, item.result!.blob.type),
+                                  namedOutput(item.file.name, item.result!.blob.type),
                                 )
                               }
                             >
@@ -449,135 +458,196 @@ export default function App() {
               <SlidersHorizontal size={16} />
               <h2>Export settings</h2>
             </div>
-            <fieldset disabled={disabled}>
-              <legend className="step-label">Preset</legend>
-              <div className="presets">
-                {presets.map((p) => (
-                  <button
-                    key={p.name}
-                    type="button"
-                    className={preset === p.name ? 'active' : ''}
-                    aria-pressed={preset === p.name}
-                    onClick={() => {
-                      invalidate();
-                      setPreset(p.name);
-                      setWidth(p.width);
-                      setHeight(p.height);
-                    }}
-                  >
-                    {p.name}
-                  </button>
-                ))}
-              </div>
-              <p className="hint">
-                {presets.find((p) => p.name === preset)?.note || 'Custom dimensions'}
-              </p>
-            </fieldset>
-            <fieldset disabled={disabled}>
-              <legend className="step-label">Format</legend>
-              <div className="format-options">
-                {(['image/webp', 'image/jpeg', 'image/png'] as Format[]).map((f) => (
-                  <label key={f} className={format === f ? 'checked' : ''}>
-                    <input
-                      type="radio"
-                      name="format"
-                      checked={format === f}
-                      onChange={() => {
+            <div className="settings-tabs" aria-label="Settings sections">
+              <button
+                type="button"
+                aria-pressed={settingsTab === 'export'}
+                onClick={() => setSettingsTab('export')}
+              >
+                Export
+              </button>
+              <button
+                type="button"
+                aria-pressed={settingsTab === 'transform'}
+                onClick={() => setSettingsTab('transform')}
+              >
+                Transform
+              </button>
+            </div>
+            <div className="export-settings" hidden={settingsTab !== 'export'}>
+              <fieldset disabled={disabled}>
+                <legend className="step-label">Preset</legend>
+                <div className="presets">
+                  {presets.map((p) => (
+                    <button
+                      key={p.name}
+                      type="button"
+                      className={preset === p.name ? 'active' : ''}
+                      aria-pressed={preset === p.name}
+                      onClick={() => {
                         invalidate();
-                        setFormat(f);
+                        setPreset(p.name);
+                        setWidth(p.width);
+                        setHeight(p.height);
                       }}
-                    />
-                    <span>{formatNames[f]}</span>
-                    {f === 'image/webp' && <small>Recommended</small>}
+                    >
+                      {p.name}
+                    </button>
+                  ))}
+                </div>
+                <p className="hint">
+                  {presets.find((p) => p.name === preset)?.note || 'Custom dimensions'}
+                </p>
+              </fieldset>
+              <fieldset disabled={disabled}>
+                <legend className="step-label">Format</legend>
+                <div className="format-options">
+                  {(['image/webp', 'image/jpeg', 'image/png'] as Format[]).map((f) => (
+                    <label key={f} className={format === f ? 'checked' : ''}>
+                      <input
+                        type="radio"
+                        name="format"
+                        checked={format === f}
+                        onChange={() => {
+                          invalidate();
+                          setFormat(f);
+                        }}
+                      />
+                      <span>{formatNames[f]}</span>
+                      {f === 'image/webp' && <small>Recommended</small>}
+                    </label>
+                  ))}
+                </div>
+                <p className="hint">
+                  {format === 'image/png'
+                    ? 'Lossless output. Best for transparency and graphics.'
+                    : format === 'image/jpeg'
+                      ? 'Lossy format for photographs.'
+                      : 'Lossy format with transparency support.'}
+                </p>
+              </fieldset>
+              <fieldset disabled={disabled || format === 'image/png'}>
+                <legend className="step-label">
+                  Quality <strong>{format === 'image/png' ? 'Lossless' : quality + '%'}</strong>
+                </legend>
+                <input
+                  aria-label="Image quality"
+                  type="range"
+                  min="10"
+                  max="100"
+                  value={quality}
+                  onChange={(e) => {
+                    invalidate();
+                    setQuality(Number(e.target.value));
+                  }}
+                />
+                <div className="range-labels">
+                  <span>Smaller file</span>
+                  <span>More detail</span>
+                </div>
+                {format === 'image/png' && (
+                  <p className="hint">PNG doesn’t use a quality setting.</p>
+                )}
+              </fieldset>
+              <fieldset disabled={disabled}>
+                <legend className="step-label">Maximum dimensions</legend>
+                <div className="dimension-fields">
+                  <label>
+                    Max width
+                    <div>
+                      <input
+                        type="number"
+                        min="1"
+                        max="20000"
+                        value={width}
+                        onChange={(e) => {
+                          invalidate();
+                          setPreset('Custom');
+                          setWidth(Number(e.target.value));
+                        }}
+                      />
+                      <span>px</span>
+                    </div>
                   </label>
-                ))}
-              </div>
-              <p className="hint">
-                {format === 'image/png'
-                  ? 'Lossless output. Best for transparency and graphics.'
-                  : format === 'image/jpeg'
-                    ? 'Lossy format for photographs.'
-                    : 'Lossy format with transparency support.'}
-              </p>
-            </fieldset>
-            <fieldset disabled={disabled || format === 'image/png'}>
-              <legend className="step-label">
-                Quality <strong>{format === 'image/png' ? 'Lossless' : quality + '%'}</strong>
-              </legend>
-              <input
-                aria-label="Image quality"
-                type="range"
-                min="10"
-                max="100"
-                value={quality}
-                onChange={(e) => {
-                  invalidate();
-                  setQuality(Number(e.target.value));
-                }}
-              />
-              <div className="range-labels">
-                <span>Smaller file</span>
-                <span>More detail</span>
-              </div>
-              {format === 'image/png' && <p className="hint">PNG doesn’t use a quality setting.</p>}
-            </fieldset>
-            <fieldset disabled={disabled}>
-              <legend className="step-label">Maximum dimensions</legend>
-              <div className="dimension-fields">
-                <label>
-                  Max width
-                  <div>
+                  <X size={12} />
+                  <label>
+                    Max height
+                    <div>
+                      <input
+                        type="number"
+                        min="1"
+                        max="20000"
+                        value={height}
+                        onChange={(e) => {
+                          invalidate();
+                          setPreset('Custom');
+                          setHeight(Number(e.target.value));
+                        }}
+                      />
+                      <span>px</span>
+                    </div>
+                  </label>
+                </div>
+                <span className="aspect-note">
+                  <Check size={12} />
+                  Preserve aspect ratio. No upscaling.
+                </span>
+                {format === 'image/jpeg' && (
+                  <label className="background-field">
+                    Transparency background
                     <input
-                      type="number"
-                      min="1"
-                      max="20000"
-                      value={width}
+                      type="color"
+                      value={background}
                       onChange={(e) => {
                         invalidate();
-                        setPreset('Custom');
-                        setWidth(Number(e.target.value));
+                        setBackground(e.target.value);
                       }}
                     />
-                    <span>px</span>
-                  </div>
-                </label>
-                <X size={12} />
-                <label>
-                  Max height
-                  <div>
-                    <input
-                      type="number"
-                      min="1"
-                      max="20000"
-                      value={height}
-                      onChange={(e) => {
-                        invalidate();
-                        setPreset('Custom');
-                        setHeight(Number(e.target.value));
-                      }}
-                    />
-                    <span>px</span>
-                  </div>
-                </label>
-              </div>
-              <span className="aspect-note">
-                <Check size={12} />
-                Preserve aspect ratio. No upscaling.
-              </span>
-              {format === 'image/jpeg' && (
-                <label className="background-field">
-                  Transparency background
+                  </label>
+                )}
+              </fieldset>
+            </div>
+            <div className="transform-settings" hidden={settingsTab !== 'transform'}>
+              <fieldset disabled={disabled}>
+                <legend className="step-label">Rotation</legend>
+                <select
+                  aria-label="Image rotation"
+                  value={rotation}
+                  onChange={(e) => {
+                    invalidate();
+                    setRotation(Number(e.target.value));
+                  }}
+                >
+                  <option value={0}>Original orientation</option>
+                  <option value={90}>90° clockwise</option>
+                  <option value={180}>180°</option>
+                  <option value={270}>90° counterclockwise</option>
+                </select>
+                <label className="transform-check">
                   <input
-                    type="color"
-                    value={background}
+                    type="checkbox"
+                    checked={flip}
                     onChange={(e) => {
                       invalidate();
-                      setBackground(e.target.value);
+                      setFlip(e.target.checked);
                     }}
                   />
+                  Flip horizontally
                 </label>
-              )}
-            </fieldset>
+              </fieldset>
+              <label className="prefix-field">
+                Filename prefix
+                <input
+                  maxLength={40}
+                  value={prefix}
+                  placeholder="e.g. event-photos"
+                  onChange={(e) => setPrefix(e.target.value)}
+                />
+              </label>
+              <p className="hint">
+                Applies to every file in this batch. Export dimensions use the rotated orientation.
+              </p>
+            </div>
           </aside>
         </div>
         {error && (
