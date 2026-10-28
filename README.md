@@ -1,11 +1,6 @@
-<h1>
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/logo-dark.svg">
-    <img src="docs/logo.svg" alt="Image Desk" width="280" height="72">
-  </picture>
-</h1>
+# Image Desk
 
-Resize and convert images directly in the browser. Choose a format, set dimensions and quality, then download the results.
+A browser tool for resizing and converting images in batches. Set the size, format and quality, then download the files individually or as a ZIP.
 
 [Open Image Desk](https://jpndmatos.github.io/image-desk/)
 
