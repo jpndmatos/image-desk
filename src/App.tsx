@@ -239,6 +239,14 @@ export default function App() {
       </a>
       <header className="topbar">
         <a className="brand" href="./">
+          <img
+            className="app-icon"
+            src={import.meta.env.BASE_URL + 'favicon.svg?v=2'}
+            width="28"
+            height="28"
+            alt=""
+            aria-hidden="true"
+          />
           Image Desk
         </a>
         <span className="header-purpose">Image converter</span>
