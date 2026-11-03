@@ -1,4 +1,3 @@
-import ThemeToggle from './ThemeToggle';
 import { useEffect, useRef, useState } from 'react';
 import {
   ArrowRight,
@@ -14,7 +13,6 @@ import {
   Upload,
   X,
 } from 'lucide-react';
-import { zipSync } from 'fflate';
 import {
   bytes,
   fitSize,
@@ -216,6 +214,7 @@ export default function App() {
   async function downloadAll() {
     const ready = items.filter((x) => x.result);
     try {
+      const { zipSync } = await import('fflate');
       const entries: Record<string, Uint8Array> = {};
       for (let i = 0; i < ready.length; i++) {
         const item = ready[i];
@@ -238,6 +237,8 @@ export default function App() {
     originalBytes = ready.reduce((n, x) => n + x.file.size, 0),
     outputBytes = ready.reduce((n, x) => n + x.result!.blob.size, 0),
     saved = originalBytes - outputBytes;
+  const [selectedId, setSelectedId] = useState('');
+  const staged = items.find((x) => x.id === selectedId) || items[0];
   const active = items.find((x) => x.id === compare);
   const disabled = busy || adding;
   return (
@@ -258,7 +259,14 @@ export default function App() {
           Image Desk
         </a>
         <span className="header-purpose">Image converter</span>
-        <ThemeToggle />
+        <a
+          className="portfolio-link"
+          href={
+            import.meta.env.VITE_PORTFOLIO_URL || 'https://jpndmatos.github.io/Portfolio/#projects'
+          }
+        >
+          ← Portfolio
+        </a>
       </header>
       <main>
         <div className="intro">
@@ -363,86 +371,113 @@ export default function App() {
                 </div>
               </div>
             ) : (
-              <div className="image-grid">
-                {items.map((item) => {
-                  let target;
-                  try {
-                    const oriented = orientedSize(item.width, item.height, rotation);
-                    target = fitSize(oriented.width, oriented.height, width, height);
-                  } catch {
-                    target = { width: item.width, height: item.height };
-                  }
-                  const saving = item.result
-                    ? Math.round((1 - item.result.blob.size / item.file.size) * 100)
-                    : 0;
-                  return (
-                    <article className="image-card" key={item.id}>
-                      <div className="image-preview">
-                        <img src={item.result?.url || item.url} alt={item.file.name} />
-                        <button
-                          className="preview-button"
-                          onClick={() => setCompare(item.id)}
-                          aria-label={'Preview ' + item.file.name}
-                        >
-                          <Maximize2 size={15} />
-                        </button>
-                        <button
-                          className="remove-button"
-                          disabled={disabled}
-                          onClick={() => remove(item.id)}
-                          aria-label={'Remove ' + item.file.name}
-                        >
-                          <X size={14} />
-                        </button>
-                        {item.result && (
-                          <span className={'savings ' + (saving < 0 ? 'larger' : '')}>
-                            {saving >= 0 ? '−' + saving + '%' : 'Larger file'}
-                          </span>
-                        )}
-                      </div>
-                      <div className="image-details">
-                        <h3 title={item.file.name}>{item.file.name}</h3>
-                        <p>
-                          {item.width} × {item.height}
-                          <ChevronRight size={11} />
-                          {item.result
-                            ? `${item.result.width} × ${item.result.height}`
-                            : `${target.width} × ${target.height}`}
-                        </p>
-                        <div className="image-bottom">
-                          <span>
-                            {bytes(item.file.size)}
-                            {item.result && (
-                              <>
-                                <ArrowRight size={11} />
-                                <strong>{bytes(item.result.blob.size)}</strong>
-                              </>
-                            )}
-                          </span>
-                          {item.result ? (
-                            <button
-                              className="icon-button"
-                              aria-label={'Download ' + item.file.name}
-                              onClick={() =>
-                                download(
-                                  item.result!.blob,
-                                  namedOutput(item.file.name, item.result!.blob.type),
-                                )
-                              }
-                            >
-                              <Download size={17} />
-                            </button>
-                          ) : (
-                            <span className="status-label">
-                              {busy ? 'Working…' : 'Ready to process'}
+              <div className="studio-content">
+                {staged && (
+                  <div className="studio-stage">
+                    <button
+                      className="stage-image"
+                      onClick={() => setCompare(staged.id)}
+                      aria-label={'Open full preview of ' + staged.file.name}
+                    >
+                      <img src={staged.result?.url || staged.url} alt={staged.file.name} />
+                      <span>
+                        <Maximize2 size={14} /> Full preview
+                      </span>
+                    </button>
+                    <div className="stage-caption">
+                      <strong>{staged.file.name}</strong>
+                      <span>
+                        {staged.width} × {staged.height} ·{' '}
+                        {staged.result ? 'Processed' : 'Original'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+                <div className="image-grid">
+                  {items.map((item) => {
+                    let target;
+                    try {
+                      const oriented = orientedSize(item.width, item.height, rotation);
+                      target = fitSize(oriented.width, oriented.height, width, height);
+                    } catch {
+                      target = { width: item.width, height: item.height };
+                    }
+                    const saving = item.result
+                      ? Math.round((1 - item.result.blob.size / item.file.size) * 100)
+                      : 0;
+                    return (
+                      <article
+                        className={'image-card ' + (staged?.id === item.id ? 'is-selected' : '')}
+                        key={item.id}
+                      >
+                        <div className="image-preview">
+                          <img src={item.result?.url || item.url} alt={item.file.name} />
+                          <button
+                            className="preview-button"
+                            onClick={() => setSelectedId(item.id)}
+                            aria-label={'Select ' + item.file.name}
+                            aria-pressed={staged?.id === item.id}
+                          >
+                            <Maximize2 size={15} />
+                          </button>
+                          <button
+                            className="remove-button"
+                            disabled={disabled}
+                            onClick={() => remove(item.id)}
+                            aria-label={'Remove ' + item.file.name}
+                          >
+                            <X size={14} />
+                          </button>
+                          {item.result && (
+                            <span className={'savings ' + (saving < 0 ? 'larger' : '')}>
+                              {saving >= 0 ? '−' + saving + '%' : 'Larger file'}
                             </span>
                           )}
                         </div>
-                        {item.error && <p className="card-error">{item.error}</p>}
-                      </div>
-                    </article>
-                  );
-                })}
+                        <div className="image-details">
+                          <h3 title={item.file.name}>{item.file.name}</h3>
+                          <p>
+                            {item.width} × {item.height}
+                            <ChevronRight size={11} />
+                            {item.result
+                              ? `${item.result.width} × ${item.result.height}`
+                              : `${target.width} × ${target.height}`}
+                          </p>
+                          <div className="image-bottom">
+                            <span>
+                              {bytes(item.file.size)}
+                              {item.result && (
+                                <>
+                                  <ArrowRight size={11} />
+                                  <strong>{bytes(item.result.blob.size)}</strong>
+                                </>
+                              )}
+                            </span>
+                            {item.result ? (
+                              <button
+                                className="icon-button"
+                                aria-label={'Download ' + item.file.name}
+                                onClick={() =>
+                                  download(
+                                    item.result!.blob,
+                                    namedOutput(item.file.name, item.result!.blob.type),
+                                  )
+                                }
+                              >
+                                <Download size={17} />
+                              </button>
+                            ) : (
+                              <span className="status-label">
+                                {busy ? 'Working…' : 'Ready to process'}
+                              </span>
+                            )}
+                          </div>
+                          {item.error && <p className="card-error">{item.error}</p>}
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
               </div>
             )}
             {dragging && (
@@ -730,6 +765,7 @@ export default function App() {
       <dialog
         ref={preview}
         className="preview-dialog"
+        aria-label={active ? 'Preview ' + active.file.name : 'Image preview'}
         onCancel={() => setCompare(null)}
         onClick={(e) => {
           if (e.target === e.currentTarget) {
@@ -756,12 +792,14 @@ export default function App() {
             <div className="compare-controls">
               <button
                 className={showOriginal ? 'active' : ''}
+                aria-pressed={showOriginal}
                 onClick={() => setShowOriginal(true)}
               >
                 Original / {bytes(active.file.size)}
               </button>
               <button
                 className={!showOriginal ? 'active' : ''}
+                aria-pressed={!showOriginal}
                 onClick={() => setShowOriginal(false)}
               >
                 {active.result ? `Processed / ${bytes(active.result.blob.size)}` : 'Preview'}
