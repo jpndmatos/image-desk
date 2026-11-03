@@ -18,11 +18,9 @@ A browser tool for resizing and converting images in batches. Set the size, form
 - Batch resizing, quarter-turn rotation, and horizontal flipping.
 - Format, quality, and transparency background settings.
 - Original and processed previews with file-size comparisons.
-- Filename prefixes, individual downloads or a ZIP, and a dedicated visual design.
+- Filename prefixes, individual downloads or a ZIP.
 
 Images are processed on your device using Canvas. Files stay in the browser.
-
-The desktop workbench keeps the file queue, export settings, and processing actions on one screen.
 
 ## Stack
 
@@ -45,11 +43,9 @@ npm run build
 npm run preview
 ```
 
-## Interface
+## Implementation notes
 
-A neutral canvas studio with a large selected-image preview, a horizontal file strip, an export inspector and mobile export actions. Files stay on the device. The ZIP library loads only when an archive is requested.
-
-Each repository builds independently. System fonts keep the initial view free of font downloads.
+The original files stay untouched. Changing export settings clears the previous results so an old download cannot be mistaken for a new conversion. Object URLs are revoked when a file is removed; ZIP support loads only when requested.
 
 ## Verification
 

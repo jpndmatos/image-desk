@@ -64,6 +64,7 @@ export default function App() {
     [height, setHeight] = useState(1600),
     [background, setBackground] = useState('#ffffff'),
     [busy, setBusy] = useState(false),
+    [archiving, setArchiving] = useState(false),
     [adding, setAdding] = useState(false),
     [dragging, setDragging] = useState(false),
     [error, setError] = useState(''),
@@ -112,7 +113,7 @@ export default function App() {
     );
   }
   async function addFiles(files: File[]) {
-    if (busy || adding) return;
+    if (busy || adding || archiving) return;
     setAdding(true);
     setError('');
     const accepted: Item[] = [];
@@ -154,7 +155,7 @@ export default function App() {
       setNotice(`${accepted.length} image${accepted.length === 1 ? '' : 's'} added. `);
   }
   async function convert() {
-    if (busy || adding || !items.length) return;
+    if (busy || adding || archiving || !items.length) return;
     if (
       !Number.isInteger(width) ||
       !Number.isInteger(height) ||
@@ -212,6 +213,9 @@ export default function App() {
     );
   }
   async function downloadAll() {
+    if (archiving) return;
+    setArchiving(true);
+    setError('');
     const ready = items.filter((x) => x.result);
     try {
       const { zipSync } = await import('fflate');
@@ -231,6 +235,8 @@ export default function App() {
       setNotice('ZIP downloaded.');
     } catch {
       setError('Could not create the ZIP. You can still download images individually.');
+    } finally {
+      setArchiving(false);
     }
   }
   const ready = items.filter((x) => x.result),
@@ -240,7 +246,7 @@ export default function App() {
   const [selectedId, setSelectedId] = useState('');
   const staged = items.find((x) => x.id === selectedId) || items[0];
   const active = items.find((x) => x.id === compare);
-  const disabled = busy || adding;
+  const disabled = busy || adding || archiving;
   return (
     <>
       <a className="skip" href="#workspace">
@@ -248,14 +254,6 @@ export default function App() {
       </a>
       <header className="topbar">
         <a className="brand" href="./">
-          <img
-            className="app-icon"
-            src={import.meta.env.BASE_URL + 'favicon.svg?v=2'}
-            width="28"
-            height="28"
-            alt=""
-            aria-hidden="true"
-          />
           Image Desk
         </a>
         <span className="header-purpose">Image converter</span>
@@ -726,10 +724,11 @@ export default function App() {
                 <button
                   className={ready.length === items.length ? 'button primary' : 'button'}
                   disabled={disabled}
+                  aria-busy={archiving}
                   onClick={() => void downloadAll()}
                 >
-                  <Download size={16} />
-                  Download ZIP
+                  {archiving ? <LoaderCircle size={16} className="spin" /> : <Download size={16} />}
+                  {archiving ? 'Preparing ZIP…' : 'Download ZIP'}
                 </button>
               )}
               {ready.length < items.length && (

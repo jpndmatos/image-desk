@@ -1,11 +1,3 @@
-/* Hallmark · shape: app screen · genre: modern-minimal · theme: custom · redesign: full
- * display: Poppins · body: Poppins · nav: file toolbar · signature: batch queue and export inspector
- * states: empty, processing, error, full · axes: light/geometric-sans/warm · v2.0.0 */
-/* Hallmark · pre-emit critique: the file queue leads; export controls stay visible beside it. */
-/* Hallmark · answered F3 · app headings use short fixed-size labels rather than display typography */
-/* Hallmark · answered F4 · selected tabs and file settings are state indicators, not competing primary actions */
-/* Hallmark · dismissed 3 · equal grid columns contain user-selected image files, not marketing feature tiles */
-/* Hallmark · dismissed 41 · image-card inherits the paired ink token for both supported themes */
 @import url('./tokens.css');
 @import url('./base.css');
 .topbar {
@@ -17,9 +9,6 @@
   align-items: center;
   gap: 24px;
   border-bottom: 1px solid var(--color-rule);
-}
-.topbar .theme-toggle {
-  margin-left: auto;
 }
 main {
   max-width: 1600px;
@@ -602,13 +591,6 @@ main {
   .brand {
     font-size: 21px;
   }
-  .theme-toggle {
-    min-width: 40px;
-    padding: 8px;
-  }
-  .theme-toggle > span {
-    display: none;
-  }
   main {
     padding: 24px 16px;
   }
@@ -888,11 +870,6 @@ main {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-}
-.app-icon {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
 }
 
 /* File actions remain readable against image content. */
