@@ -254,17 +254,18 @@ export default function App() {
       </a>
       <header className="topbar">
         <a className="brand" href="./">
+          <svg className="brand-symbol" viewBox="0 0 30 30" aria-hidden="true">
+            <path
+              d="M3 11V3h8m8 0h8v8M3 19v8h8"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+            <path d="M18 18h9v9h-9z" fill="#d6e582" />
+          </svg>
           Image Desk
         </a>
         <span className="header-purpose">Image converter</span>
-        <a
-          className="portfolio-link"
-          href={
-            import.meta.env.VITE_PORTFOLIO_URL || 'https://jpndmatos.github.io/Portfolio/#projects'
-          }
-        >
-          ← Portfolio
-        </a>
       </header>
       <main>
         <div className="intro">
