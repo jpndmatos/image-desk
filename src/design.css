@@ -496,6 +496,9 @@ main {
 }
 
 /* Editing workbench: dark tool rail, square controls and an alpha checkerboard. */
+.topbar .brand:focus-visible {
+  outline-color: #d6e582;
+}
 :root {
   --font-body: Arial, 'Helvetica Neue', sans-serif;
 }
