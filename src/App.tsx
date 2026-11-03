@@ -51,6 +51,7 @@ function download(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(url), 30000);
 }
 export default function App() {
+  const [panel, setPanel] = useState<'canvas' | 'settings'>('canvas');
   const [rotation, setRotation] = useState(0),
     [flip, setFlip] = useState(false),
     [prefix, setPrefix] = useState(''),
@@ -275,7 +276,15 @@ export default function App() {
           </div>
           <p className="privacy-note">Files are processed on this device.</p>
         </div>
-        <div id="workspace" className="workspace">
+        <nav className="studio-tabs" aria-label="Studio panel">
+          <button aria-pressed={panel === 'canvas'} onClick={() => setPanel('canvas')}>
+            Preview
+          </button>
+          <button aria-pressed={panel === 'settings'} onClick={() => setPanel('settings')}>
+            Export settings
+          </button>
+        </nav>
+        <div id="workspace" className="workspace" data-panel={panel}>
           <section
             className={'desk ' + (dragging ? 'dragging' : '')}
             onDragEnter={(e) => {
@@ -358,14 +367,17 @@ export default function App() {
                   <button
                     disabled={disabled}
                     onClick={async () => {
+                      setAdding(true);
                       try {
                         await addFiles([await sampleFile()]);
                       } catch {
                         setError('Could not create the sample. Try choosing an image.');
+                      } finally {
+                        setAdding(false);
                       }
                     }}
                   >
-                    Load sample <ArrowRight size={12} />
+                    {adding ? 'Preparing sample…' : 'Load sample'} <ArrowRight size={12} />
                   </button>
                 </div>
               </div>
@@ -392,7 +404,7 @@ export default function App() {
                     </div>
                   </div>
                 )}
-                <div className="image-grid">
+                <div className="image-grid" tabIndex={0} role="region" aria-label="Image files">
                   {items.map((item) => {
                     let target;
                     try {
@@ -487,7 +499,7 @@ export default function App() {
               </div>
             )}
           </section>
-          <aside className="settings">
+          <aside className="settings" tabIndex={0} aria-label="Export settings">
             <div className="panel-heading">
               <SlidersHorizontal size={16} />
               <h2>Export settings</h2>

@@ -1,0 +1,275 @@
+html,
+body,
+#root {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+#root {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.topbar {
+  flex: none;
+  min-height: 58px;
+  padding: 10px 20px;
+}
+main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  padding: 16px 20px;
+  gap: 12px;
+}
+.intro {
+  flex: none;
+  margin: 0;
+}
+.intro h1 {
+  font-size: 23px;
+}
+.intro > div > p {
+  margin-top: 3px;
+}
+.workspace {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  grid-template-columns: minmax(0, 1fr) 286px;
+}
+.desk {
+  min-height: 0;
+  height: 100%;
+}
+.desk-toolbar {
+  padding: 8px 16px;
+  min-height: 52px;
+  flex: none;
+}
+.dropzone {
+  min-height: 0;
+  margin: 16px;
+  padding: 16px;
+}
+.studio-content {
+  min-height: 0;
+}
+.studio-stage {
+  min-height: 0;
+  padding: 16px;
+}
+.stage-image img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  box-shadow: none;
+}
+.stage-caption {
+  flex: none;
+  padding-top: 12px;
+}
+.image-grid {
+  max-height: 134px;
+  min-height: 112px;
+  padding: 10px 16px;
+}
+.image-card {
+  min-height: 100px;
+}
+.image-details {
+  overflow: auto;
+}
+.image-preview {
+  min-height: 98px;
+}
+.settings {
+  grid-column: 2;
+  grid-row: 1;
+  height: 100%;
+  overflow: auto;
+  max-height: 100%;
+  padding: 18px;
+  overscroll-behavior: contain;
+}
+.panel-heading {
+  margin-bottom: 16px;
+}
+.settings-tabs {
+  margin-bottom: 18px;
+}
+.action-bar {
+  flex: none;
+  position: static;
+  width: 100%;
+  padding: 8px 0 0;
+  min-height: 56px;
+  border: 0;
+}
+.studio-tabs {
+  display: none;
+}
+.error {
+  flex: none;
+  margin: 0;
+}
+@media (max-width: 760px) {
+  .topbar {
+    min-height: 54px;
+    padding: 8px 16px;
+  }
+  main {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+  .intro h1 {
+    font-size: 22px;
+  }
+  .intro > div > p {
+    font-size: 12px;
+  }
+  .intro .privacy-note {
+    display: none;
+  }
+  .studio-tabs {
+    display: flex;
+    flex: none;
+    gap: 20px;
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .studio-tabs button {
+    min-height: 44px;
+    padding: 8px 0;
+    border: 0;
+    background: transparent;
+    font-size: 13px;
+    color: var(--color-ink-2);
+  }
+  .studio-tabs button[aria-pressed='true'] {
+    color: var(--color-accent);
+    box-shadow: inset 0 -3px var(--color-accent);
+  }
+  .workspace {
+    display: flex;
+    min-height: 0;
+  }
+  .desk,
+  .settings {
+    flex: 1;
+    width: 100%;
+  }
+  .workspace[data-panel='canvas'] .settings,
+  .workspace[data-panel='settings'] .desk {
+    display: none;
+  }
+  .settings {
+    border: 0;
+    padding: 18px;
+  }
+  .desk-toolbar {
+    padding: 6px 12px;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+  .desk-toolbar > div {
+    gap: 6px;
+  }
+  .queue-actions {
+    gap: 4px;
+  }
+  .queue-actions .button {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+  .queue-actions .text-button {
+    font-size: 12px;
+  }
+  .studio-stage {
+    padding: 12px;
+  }
+  .stage-caption {
+    font-size: 12px;
+    gap: 6px;
+  }
+  .stage-image > span {
+    bottom: 8px;
+    right: 8px;
+    font-size: 12px;
+    padding: 8px;
+  }
+  .image-grid {
+    min-height: 106px;
+    max-height: 124px;
+    padding: 8px 12px;
+  }
+  .image-card {
+    min-width: 210px;
+    min-height: 96px;
+  }
+  .image-preview {
+    min-height: 94px;
+  }
+  .action-bar {
+    padding: 4px 0 0;
+    gap: 6px;
+  }
+  .action-bar .batch-summary {
+    flex-direction: row;
+    gap: 8px;
+  }
+  .action-bar .batch-summary p {
+    display: none;
+  }
+  .action-buttons .button {
+    min-height: 44px;
+  }
+  .toast {
+    bottom: 100px;
+  }
+}
+@media (max-height: 600px) {
+  .intro {
+    display: none;
+  }
+  .image-grid {
+    min-height: 92px;
+    max-height: 100px;
+  }
+  .image-preview {
+    min-height: 80px;
+  }
+  .stage-caption {
+    padding-top: 6px;
+  }
+}
+
+.workspace {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+@media (max-height: 600px) {
+  .intro {
+    display: flex;
+  }
+  .intro h1 {
+    font-size: 18px;
+  }
+  .intro > div > p,
+  .intro .privacy-note {
+    display: none;
+  }
+}
+
+@media (max-height: 430px) {
+  main {
+    overflow: auto;
+  }
+  .workspace {
+    flex: none;
+    min-height: 300px;
+  }
+}

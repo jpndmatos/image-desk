@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-03T19:04:21.047Z",
+  "date": "2026-11-03T21:25:28.826Z",
   "app": "image-desk",
   "url": "http://127.0.0.1:5181/demo/image-desk/",
   "lighthouseVersion": "12.8.2",
@@ -11,24 +11,24 @@
   },
   "metrics": {
     "first-contentful-paint": {
-      "value": 2251.684,
+      "value": 2251.9719999999998,
       "display": "2.3 s"
     },
     "largest-contentful-paint": {
-      "value": 2251.684,
+      "value": 2251.9719999999998,
       "display": "2.3 s"
     },
     "total-blocking-time": {
-      "value": 0,
-      "display": "0 ms"
+      "value": 7,
+      "display": "10 ms"
     },
     "cumulative-layout-shift": {
       "value": 0,
       "display": "0"
     },
     "total-byte-weight": {
-      "value": 272643,
-      "display": "Total size was 266 KiB"
+      "value": 276469,
+      "display": "Total size was 270 KiB"
     }
   }
 }

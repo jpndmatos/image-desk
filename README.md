@@ -49,4 +49,6 @@ The original files stay untouched. Changing export settings clears the previous 
 
 ## Verification
 
+The app fills the viewport, with longer lists scrolling inside their panels. On phones, Preview and Export settings switch between work areas; export actions stay visible. Layout checks cover 320×568 through 1440×900.
+
 The production build and unit tests pass. Portfolio integration checks cover the main workflows at 390px and 1440px, WCAG A/AA checks including WCAG 2.2 target sizes, and failure handling. The mobile Lighthouse lab result is saved in `docs/performance.json`; it is a local observation, not a field-performance guarantee.
