@@ -80,9 +80,29 @@ main {
 }
 .image-card {
   min-height: 100px;
+  width: 240px;
+  min-width: 240px;
 }
 .image-details {
-  overflow: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px 10px;
+}
+.image-details > p {
+  margin-top: 2px;
+  font-size: 11px;
+}
+.image-bottom {
+  margin-top: 2px;
+}
+.image-bottom > span {
+  gap: 3px;
+}
+.image-details .status-label {
+  font-size: 10px;
+  line-height: 1.4;
 }
 .image-preview {
   min-height: 98px;

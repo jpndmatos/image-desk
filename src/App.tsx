@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import {
   ArrowRight,
   Check,
-  ChevronRight,
   Download,
   Images,
   LoaderCircle,
@@ -398,7 +397,8 @@ export default function App() {
                     <div className="stage-caption">
                       <strong>{staged.file.name}</strong>
                       <span>
-                        {staged.width} × {staged.height} ·{' '}
+                        {staged.result?.width ?? staged.width} ×{' '}
+                        {staged.result?.height ?? staged.height} ·{' '}
                         {staged.result ? 'Processed' : 'Original'}
                       </span>
                     </div>
@@ -448,11 +448,10 @@ export default function App() {
                         <div className="image-details">
                           <h3 title={item.file.name}>{item.file.name}</h3>
                           <p>
-                            {item.width} × {item.height}
-                            <ChevronRight size={11} />
                             {item.result
                               ? `${item.result.width} × ${item.result.height}`
-                              : `${target.width} × ${target.height}`}
+                              : `${target.width} × ${target.height}`}{' '}
+                            px
                           </p>
                           <div className="image-bottom">
                             <span>
