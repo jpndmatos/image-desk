@@ -21,7 +21,7 @@ try {
     await page.goto(process.env.IMAGE_DESK_URL || 'http://127.0.0.1:5175/');
     await page.getByRole('button', { name: 'Load sample', exact: true }).click();
     await page.getByRole('button', { name: 'Process images', exact: true }).click();
-    await expect(page.locator('.stage-caption')).toContainText('1600 Ã— 1067');
+    await expect(page.locator('.stage-caption')).toContainText('1600 × 1067');
     await expect(page.locator('.stage-caption')).toContainText('Processed');
     expect(
       await page.locator('.image-details').evaluate((e) => e.scrollHeight <= e.clientHeight),
@@ -43,7 +43,7 @@ try {
       axe.violations.map((v) => ({ id: v.id, targets: v.nodes.map((n) => n.target) })),
     ).toEqual([]);
     console.log(
-      `PASS Image Desk ${width}Ã—${height}: real Canvas conversion, dimensions, ZIP and accessibility.`,
+      `PASS Image Desk ${width}×${height}: real Canvas conversion, dimensions, ZIP and accessibility.`,
     );
     await context.close();
   }
