@@ -16,5 +16,3 @@ npm run dev
 ```
 
 Open http://localhost:5175. Use **Load sample** or bring your own images. Processing stays on your device; originals are untouched.
-
-React · TypeScript · Canvas · fflate. [Development notes](docs/development.md).
