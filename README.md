@@ -2,8 +2,6 @@
 
 Drop or paste images to resize, rotate, flip, and convert them to WebP, JPEG, or PNG. Download files individually or as a ZIP, with an optional filename prefix.
 
-[Try it](https://jpndmatos.github.io/image-desk/)
-
 ![Image Desk workspace](docs/workspace.png)
 
 ## Setup
