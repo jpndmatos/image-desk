@@ -32,8 +32,8 @@ try {
     const pending = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Download ZIP', exact: true }).click();
     const files = unzipSync(await readFile(await (await pending).path()));
-    expect(Object.keys(files)).toEqual(['01-sample-landscape.webp']);
-    const image = files['01-sample-landscape.webp'];
+    expect(Object.keys(files)).toEqual(['01-sample-landscape-web.webp']);
+    const image = files['01-sample-landscape-web.webp'];
     expect(new TextDecoder().decode(image.slice(0, 4))).toBe('RIFF');
     expect(new TextDecoder().decode(image.slice(8, 12))).toBe('WEBP');
     const axe = await new AxeBuilder({ page })
@@ -42,6 +42,24 @@ try {
     expect(
       axe.violations.map((v) => ({ id: v.id, targets: v.nodes.map((n) => n.target) })),
     ).toEqual([]);
+    if (width === 1280) {
+      await page.evaluate(async () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 32;
+        canvas.height = 24;
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve));
+        const transfer = new DataTransfer();
+        transfer.items.add(new File([blob], 'pasted.png', { type: 'image/png' }));
+        window.dispatchEvent(
+          new ClipboardEvent('paste', { clipboardData: transfer, cancelable: true }),
+        );
+      });
+      await expect(page.locator('.image-card')).toHaveCount(2);
+      await page.getByRole('button', { name: 'Process images', exact: true }).click();
+      await expect(
+        page.getByRole('button', { name: 'Download pasted.png', exact: true }),
+      ).toBeVisible();
+    }
     console.log(
       `PASS Image Desk ${width}×${height}: real Canvas conversion, dimensions, ZIP and accessibility.`,
     );

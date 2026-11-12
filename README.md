@@ -1,12 +1,12 @@
 # Image Desk
 
-Batch resize and convert images to WebP, JPEG or PNG. Export individual files or a ZIP. React, TypeScript, Canvas and fflate.
+Drop or paste images to resize, rotate, flip, and convert them to WebP, JPEG, or PNG. Download files individually or as a ZIP, with an optional filename prefix.
 
-[Open app](https://jpndmatos.github.io/image-desk/)
+[Try it](https://jpndmatos.github.io/image-desk/)
 
 ![Image Desk workspace](docs/workspace.png)
 
-## Run
+## Setup
 
 Node.js 22.14+.
 
@@ -15,13 +15,6 @@ npm ci
 npm run dev
 ```
 
-Open http://localhost:5175. Processing stays in your browser; original files are untouched.
+Open http://localhost:5175. Use **Load sample** or bring your own images. Processing stays on your device; originals are untouched.
 
-## Check
-
-```sh
-npm test
-npm run build
-```
-
-Use `npm run preview` to serve the build. With the app running, `npm run test:browser` checks real image conversion, ZIP output, responsive layouts and accessibility. Install Chromium with `npx playwright install chromium` first.
+React · TypeScript · Canvas · fflate. [Development notes](docs/development.md).

@@ -154,6 +154,24 @@ export default function App() {
     if (accepted.length)
       setNotice(`${accepted.length} image${accepted.length === 1 ? '' : 's'} added. `);
   }
+  useEffect(() => {
+    const paste = (event: ClipboardEvent) => {
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        target.closest('input, textarea, [contenteditable="true"]')
+      )
+        return;
+      const files = Array.from(event.clipboardData?.files || []).filter((file) =>
+        file.type.startsWith('image/'),
+      );
+      if (!files.length || busy || adding || archiving) return;
+      event.preventDefault();
+      void addFiles(files);
+    };
+    window.addEventListener('paste', paste);
+    return () => window.removeEventListener('paste', paste);
+  }, [busy, adding, archiving]);
   async function convert() {
     if (busy || adding || archiving || !items.length) return;
     if (
@@ -271,7 +289,7 @@ export default function App() {
         <div className="intro">
           <div>
             <h1>Convert images</h1>
-            <p>Resize and export JPEG, PNG, and WebP files.</p>
+            <p>Drop, paste, or choose images. Resize and export JPEG, PNG, and WebP.</p>
           </div>
           <p className="privacy-note">Files are processed on this device.</p>
         </div>
